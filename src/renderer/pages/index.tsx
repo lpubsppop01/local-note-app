@@ -23,6 +23,7 @@ import { IpcChannels } from '../../common/ipc-channels';
 import NoteItem from '../../common/note-item';
 import NoteLoadResult from '../../common/note-load-result';
 import MyListView from '../controls/my-list-view';
+import AddFolderDialog, { AddFolderDialogResult } from '../dialogs/add-folder-dialog';
 import PathUtility from '../utilities/path-utility';
 import withRoot from '../withRoot';
 
@@ -39,6 +40,7 @@ const styles: StyleRulesCallback<ClassNames> = theme => ({
 });
 
 type State = {
+  addFolderDialogIsOpen: boolean;
   deleteFolderDialogIsOpen: boolean;
   deleteNoteDialogIsOpen: boolean;
   editorValue: string;
@@ -64,6 +66,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   constructor(props: WithStyles<ClassNames>) {
     super(props);
     this.state = {
+      addFolderDialogIsOpen: false,
       deleteFolderDialogIsOpen: false,
       deleteNoteDialogIsOpen: false,
       editorValue: "",
@@ -81,17 +84,6 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       widthC2: 300
     };
 
-    ipcRenderer.on(IpcChannels.DIR_PATH_TO_OPEN, (event, dirPath: string) => {
-      const newFolderItem = new FolderItem({
-        key: dirPath,
-        label: PathUtility.getFilename(dirPath),
-        directoryPath: dirPath
-      });
-      this.setState({
-        folders: this.state.folders.concat(newFolderItem)
-      });
-      ipcRenderer.send(IpcChannels.SAVE_FOLDERS, this.state.folders);
-    });
     ipcRenderer.on(IpcChannels.LOADED_FOLDERS, (event, folders_) => {
       const folders = folders_.map(f => new FolderItem(f));
       this.setState({ folders });
@@ -131,8 +123,29 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   }
 
   addFolderButton_onClick = (e) => {
-    ipcRenderer.send(IpcChannels.SHOW_OPEN_DIR_DIALOG);
+    this.setState({ addFolderDialogIsOpen: true });
     e.preventDefault();
+  };
+
+  addFolderDialog_onClose = (result: AddFolderDialogResult) => {
+    if (result) {
+      const newFolderItem = new FolderItem({
+        key: result.path,
+        label: PathUtility.getFilename(result.path),
+        directoryPath: result.path,
+        isHowmDirectory: result.isHowmDirectory
+      });
+      const folders = this.state.folders.concat(newFolderItem);
+      this.setState({
+        folders,
+        addFolderDialogIsOpen: false
+      });
+      ipcRenderer.send(IpcChannels.SAVE_FOLDERS, folders);
+    } else {
+      this.setState({
+        addFolderDialogIsOpen: false
+      });
+    }
   };
 
   deleteFolderButton_onClick = (clickedFolder: FolderItem) => {
@@ -333,6 +346,9 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
                           editorDidMount={this.editor_editorDidMount.bind(this)} />
           </div>
         </div>
+
+        <AddFolderDialog open={this.state.addFolderDialogIsOpen}
+                         onClose={result => this.addFolderDialog_onClose(result)} />
 
         <Dialog
           open={this.state.deleteFolderDialogIsOpen}
