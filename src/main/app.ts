@@ -27,7 +27,7 @@ app.on("ready", () => {
   // Create and open main window
   const mainWindow = new BrowserWindow(windowState);
   if (windowState.isMaximized) mainWindow.maximize();
-  mainWindow.setTitle("Title");
+  mainWindow.setTitle("Local Note");
   mainWindow.loadURL("file://" + __dirname + "/index.html");
   mainWindow.on("closed", () => app.quit());
   
