@@ -1,0 +1,4 @@
+/dist
+/node_modules
+/local-note-app-*
+package-lock.json
