@@ -4,6 +4,7 @@ export namespace IpcChannels {
   export const SAVE_NOTE = "save-note";
   export const SAVE_WIDTH_C1 = "save-width-c1";
   export const SAVE_WIDTH_C2 = "save-width-c2";
+  export const SAVED_NOTE = "saved-note";
   export const LOAD_FOLDERS = "load-folders";
   export const LOAD_NOTES = "load-notes";
   export const LOAD_NOTE = "load-note";
@@ -14,7 +15,6 @@ export namespace IpcChannels {
   export const LOADED_NOTE = "loaded-note";
   export const LOADED_WIDTH_C1 = "loaded-width-c1";
   export const LOADED_WIDTH_C2 = "loaded-width-c2";
-  export const NOTE_LAST_MODIFIED = "note-last-modified";
   export const SHOW_OPEN_DIR_DIALOG = "show-open-dir-dialog";
   export const DIR_PATH_TO_OPEN = "dir-path-to-open";
 

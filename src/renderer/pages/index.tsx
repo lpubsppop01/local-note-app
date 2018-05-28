@@ -23,6 +23,7 @@ import FolderItem from '../../common/folder-item';
 import { IpcChannels } from '../../common/ipc-channels';
 import NoteItem from '../../common/note-item';
 import NoteLoadResult from '../../common/note-load-result';
+import NoteSaveResult from '../../common/note-save-result';
 import MyListView from '../controls/my-list-view';
 import AddFolderDialog, { AddFolderDialogResult } from '../dialogs/add-folder-dialog';
 import PathUtility from '../utilities/path-utility';
@@ -113,8 +114,8 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         }
       }
     });
-    ipcRenderer.on(IpcChannels.NOTE_LAST_MODIFIED, (event, lastModified: string) => {
-      this.setState({ lastModified });
+    ipcRenderer.on(IpcChannels.SAVED_NOTE, (event, result: NoteSaveResult) => {
+      this.setState({ lastModified: result.lastModified });
     });
     ipcRenderer.on(IpcChannels.LOADED_WIDTH_C1, (event, widthC1: number) => {
       this.setState({ widthC1 });

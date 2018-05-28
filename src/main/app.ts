@@ -65,7 +65,7 @@ app.on("ready", () => {
   ipcMain.on(IpcChannels.SAVE_NOTE, (event, note_, contentValue: string) => {
     const note = new NoteItem(note_);
     const result = NoteSerializer.save(note, contentValue);
-    event.sender.send(IpcChannels.NOTE_LAST_MODIFIED, result.lastModified);
+    event.sender.send(IpcChannels.SAVED_NOTE, result);
   });
   ipcMain.on(IpcChannels.SHOW_OPEN_DIR_DIALOG, (event) => {
     // When first argument is 'this', 'openDirectory' not works

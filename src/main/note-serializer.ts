@@ -2,10 +2,7 @@ import * as fs from "fs";
 import * as moment from 'moment';
 import NoteItem, { NoteKind } from "../common/note-item";
 import NoteLoadResult from "../common/note-load-result";
-
-export class SaveResult {
-  lastModified: string;
-}
+import NoteSaveResult from "../common/note-save-result";
 
 export default class NoteSerializer {
 
@@ -35,7 +32,7 @@ export default class NoteSerializer {
     return new NoteLoadResult({ content, lastModified, created });
   }
 
-  static save(note: NoteItem, content: string): SaveResult {
+  static save(note: NoteItem, content: string): NoteSaveResult {
     if (note.kind === NoteKind.Howm) {
       const srcFileText = fs.readFileSync(note.filePath, 'utf-8');
       const srcLines = srcFileText.split(/\n|\r\n/);
@@ -54,13 +51,13 @@ export default class NoteSerializer {
       const destFileText = destLines.join(lineSep);
       fs.writeFileSync(note.filePath, destFileText);
       const stats = fs.statSync(note.filePath);
-      const result = new SaveResult();
+      const result = new NoteSaveResult();
       result.lastModified = moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss");
       return result;
     } else {
       fs.writeFileSync(note.filePath, content);
       const stats = fs.statSync(note.filePath);
-      const result = new SaveResult();
+      const result = new NoteSaveResult();
       result.lastModified = moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss");
       return result;
     }
