@@ -173,7 +173,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     }
   };
 
-  folderListTextItem_onClick = (clickedFolder: FolderItem) => {
+  folderListItem_onClick = (clickedFolder: FolderItem) => {
     this.setState({
       notes: new Array<NoteItem>(),
       selectedFolder: clickedFolder
@@ -188,7 +188,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     });
   };
 
-  noteListTextItem_onClick = (clickedNote: NoteItem) => {
+  noteListItem_onClick = (clickedNote: NoteItem) => {
     this.setState({
       editorValue: "",
       selectedNote: clickedNote
@@ -266,11 +266,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   renderFolder(index): any {
     const folder = this.state.folders[index];
     return (
-      <ListItem button
+      <ListItem button onClick={e => this.folderListItem_onClick(folder)}
                 style={(folder === this.state.selectedFolder) ? { backgroundColor: "lightgray" } : {}}>
         <ListItemText disableTypography
-                      primary={<Typography variant="subheading" noWrap={true}>{folder.label}</Typography>}
-                      onClick={e => this.folderListTextItem_onClick(folder)} />
+                      primary={<Typography variant="subheading" noWrap={true}>{folder.label}</Typography>} />
         <ListItemSecondaryAction>
           <IconButton aria-label="Delete Folder" onClick={e => this.deleteFolderButton_onClick(folder)}>
             <DeleteIcon />
@@ -283,10 +282,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   renderNoteListItem(index): any {
     const note = this.state.notes[index];
     return (
-      <ListItem button style={(note === this.state.selectedNote) ? { backgroundColor: "lightgray" } : {}}>
+      <ListItem button onClick={e => this.noteListItem_onClick(note)}
+                style={(note === this.state.selectedNote) ? { backgroundColor: "lightgray" } : {}}>
         <ListItemText disableTypography
-                      primary={<Typography variant="subheading" noWrap={true}>{note.label}</Typography>}
-                      onClick={e => this.noteListTextItem_onClick(note)} />
+                      primary={<Typography variant="subheading" noWrap={true}>{note.label}</Typography>} />
         <ListItemSecondaryAction>
           <IconButton aria-label="Delete Note" onClick={e => this.deleteNoteButton_onClick(note)}><DeleteIcon /></IconButton>
         </ListItemSecondaryAction>
