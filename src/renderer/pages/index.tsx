@@ -1,4 +1,5 @@
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -51,6 +52,7 @@ type State = {
   selectedNote: NoteItem;
   targetNote: NoteItem;
   searchWord: string;
+  isLoadingNotes: boolean;
   noteIsEdited: boolean,
   lastModified: string,
   created: string,
@@ -77,6 +79,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       selectedNote: null,
       targetNote: null,
       searchWord: "",
+      isLoadingNotes: false,
       noteIsEdited: false,
       lastModified: "",
       created: "",
@@ -90,7 +93,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     });
     ipcRenderer.on(IpcChannels.LOADED_NOTES, (event, notes_) => {
       const notes = notes_.map(n => new NoteItem(n));
-      this.setState({ notes });
+      this.setState({ notes, isLoadingNotes: false });
     });
     ipcRenderer.on(IpcChannels.LOADED_NOTE, (event, result_) => {
       const result = new NoteLoadResult(result_);
@@ -176,7 +179,8 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   folderListItem_onClick = (clickedFolder: FolderItem) => {
     this.setState({
       notes: new Array<NoteItem>(),
-      selectedFolder: clickedFolder
+      selectedFolder: clickedFolder,
+      isLoadingNotes: true
     });
     ipcRenderer.send(IpcChannels.LOAD_NOTES, clickedFolder.key, this.state.searchWord);  
   };
@@ -198,7 +202,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
 
   searchInput_onsearch = (e: any) => {
     if (this.state.searchWord !== this.searchInput.value) {
-      this.setState({ notes: new Array<NoteItem>(), searchWord: this.searchInput.value });
+      this.setState({ notes: new Array<NoteItem>(), searchWord: this.searchInput.value, isLoadingNotes: true });
       ipcRenderer.send(IpcChannels.LOAD_NOTES, this.state.selectedFolder.key, this.searchInput.value);
     }
   }
@@ -317,9 +321,15 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
                        }} />
             <IconButton aria-label="Add Note" style={{ flex: "0 0 auto" }}><NoteAddIcon /></IconButton>
           </div>
-          <MyListView style={{ overflowY: "auto", height: "calc(100% - 64px)", marginTop: "16px" }}
-                      renderItem={(index) => this.renderNoteListItem(index)} itemHeight={48}
-                      itemCount={this.state.notes ? this.state.notes.length : 0}/>
+          {
+            this.state.isLoadingNotes
+            ? <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "16px" }}>
+                <CircularProgress size={48} />
+              </div>
+            : <MyListView style={{ overflowY: "auto", height: "calc(100% - 64px)", marginTop: "16px" }}
+                          renderItem={(index) => this.renderNoteListItem(index)} itemHeight={48}
+                          itemCount={this.state.notes ? this.state.notes.length : 0} />
+          }
         </div>
         <div style={{ width: "16px", cursor: "col-resize" }}
              onMouseDownCapture={e => this.widthResizerC2_onMouseDown(e)} />
