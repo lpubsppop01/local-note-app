@@ -34,6 +34,7 @@ export default class NoteSerializer {
 
   static save(note: NoteItem, content: string): NoteSaveResult {
     if (note.kind === NoteKind.Howm) {
+      const editedLines = content.split(/\n|\r\n/);
       const srcFileText = fs.readFileSync(note.filePath, 'utf-8');
       const srcLines = srcFileText.split(/\n|\r\n/);
       const destLines = new Array<string>();
@@ -41,7 +42,6 @@ export default class NoteSerializer {
         if (i < note.startLineNumber - 1 || note.endLineNumber && i >= note.endLineNumber) {
           destLines.push(srcLines[i++]);
         } else {
-          const editedLines = content.split(/\n|\r\n/);
           editedLines.forEach(l => destLines.push(l));
           if (!note.endLineNumber) break;
           i += note.endLineNumber - note.startLineNumber + 1;
@@ -51,14 +51,23 @@ export default class NoteSerializer {
       const destFileText = destLines.join(lineSep);
       fs.writeFileSync(note.filePath, destFileText);
       const stats = fs.statSync(note.filePath);
-      const result = new NoteSaveResult();
-      result.lastModified = moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss");
+      const result = new NoteSaveResult({
+        key: note.key,
+        filePath: note.filePath,
+        startLineNumber: note.startLineNumber,
+        endLineNumber: note.endLineNumber ? note.startLineNumber + editedLines.length - 1 : null,
+        lastModified: moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss")
+      });
       return result;
     } else {
       fs.writeFileSync(note.filePath, content);
       const stats = fs.statSync(note.filePath);
-      const result = new NoteSaveResult();
-      result.lastModified = moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss");
+      const result = new NoteSaveResult({
+        key: note.key,
+        filePath: note.filePath,
+        startLineNumber: note.startLineNumber,
+        lastModified: moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss")
+      });
       return result;
     }
   }

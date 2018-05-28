@@ -115,7 +115,34 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       }
     });
     ipcRenderer.on(IpcChannels.SAVED_NOTE, (event, result: NoteSaveResult) => {
-      this.setState({ lastModified: result.lastModified });
+      if (result.endLineNumber) {
+        let editedNote: NoteItem = null;
+        if (this.state.selectedNote && this.state.selectedNote.key === result.key) {
+          editedNote = this.state.selectedNote;
+        } else {
+          editedNote = this.state.notes.find(note => note.key === result.key);
+        }
+        const lineNumberOffset = result.endLineNumber - editedNote.endLineNumber;
+        editedNote.endLineNumber += lineNumberOffset;
+        for (let i = 0; i < this.state.notes.length; ++i) {
+          const note = this.state.notes[i];
+          if (note.filePath !== result.filePath) continue;
+          if (note.startLineNumber > result.startLineNumber) {
+            note.startLineNumber += lineNumberOffset;
+            if (note.endLineNumber) {
+              note.endLineNumber += lineNumberOffset;
+            }
+          }
+        }
+        this.setState({
+          notes: this.state.notes,
+          selectedNote: this.state.selectedNote,
+          targetNote: this.state.targetNote,
+          lastModified: result.lastModified
+        });
+      } else {
+        this.setState({ lastModified: result.lastModified });
+      }
     });
     ipcRenderer.on(IpcChannels.LOADED_WIDTH_C1, (event, widthC1: number) => {
       this.setState({ widthC1 });
