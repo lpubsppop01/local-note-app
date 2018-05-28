@@ -159,14 +159,29 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
 
   deleteFolderDialog_onClose = (dialogResult: boolean) => {
     if (dialogResult) {
-      const iTarget = this.state.folders.findIndex(f => f.key == this.state.targetFolder.key);
+      const iTarget = this.state.folders.findIndex(f => f.key === this.state.targetFolder.key);
       let newFolders = this.state.folders.map(f => f.clone());
       newFolders.splice(iTarget, 1);
-      this.setState({
-        deleteFolderDialogIsOpen: false,
-        folders: newFolders,
-        targetFolder: null
-      });
+      if (this.state.selectedFolder && this.state.selectedFolder.key === this.state.targetFolder.key) {
+        this.setState({
+          deleteFolderDialogIsOpen: false,
+          folders: newFolders,
+          targetFolder: null,
+          selectedFolder: null,
+          notes: new Array<NoteItem>(),
+          selectedNote: null,
+          editorValue: "",
+          noteIsEdited: false,
+          lastModified: "",
+          created: ""
+        });
+      } else {
+        this.setState({
+          deleteFolderDialogIsOpen: false,
+          folders: newFolders,
+          targetFolder: null
+        });
+      }
       ipcRenderer.send(IpcChannels.SAVE_FOLDERS, newFolders);
     } else {
       this.setState({
@@ -180,7 +195,12 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     this.setState({
       notes: new Array<NoteItem>(),
       selectedFolder: clickedFolder,
-      isLoadingNotes: true
+      isLoadingNotes: true,
+      selectedNote: null,
+      editorValue: "",
+      noteIsEdited: false,
+      lastModified: "",
+      created: ""
     });
     ipcRenderer.send(IpcChannels.LOAD_NOTES, clickedFolder.key, this.state.searchWord);  
   };
@@ -269,9 +289,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
 
   renderFolder(index): any {
     const folder = this.state.folders[index];
+    const folderIsSelected = this.state.selectedFolder && this.state.selectedFolder.key === folder.key;
     return (
       <ListItem button onClick={e => this.folderListItem_onClick(folder)}
-                style={(folder === this.state.selectedFolder) ? { backgroundColor: "lightgray" } : {}}>
+                style={folderIsSelected ? { backgroundColor: "lightgray" } : {}}>
         <ListItemText disableTypography
                       primary={<Typography variant="subheading" noWrap={true}>{folder.label}</Typography>} />
         <ListItemSecondaryAction>
@@ -285,9 +306,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
 
   renderNoteListItem(index): any {
     const note = this.state.notes[index];
+    const noteIsSelected = this.state.selectedNote && this.state.selectedNote.key === note.key;
     return (
       <ListItem button onClick={e => this.noteListItem_onClick(note)}
-                style={(note === this.state.selectedNote) ? { backgroundColor: "lightgray" } : {}}>
+                style={noteIsSelected ? { backgroundColor: "lightgray" } : {}}>
         <ListItemText disableTypography
                       primary={<Typography variant="subheading" noWrap={true}>{note.label}</Typography>} />
         <ListItemSecondaryAction>
