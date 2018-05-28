@@ -87,7 +87,6 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     ipcRenderer.on(IpcChannels.LOADED_FOLDERS, (event, folders_) => {
       const folders = folders_.map(f => new FolderItem(f));
       this.setState({ folders });
-      //ipcRenderer.send(IpcChannels.SAVE_FOLDERS, this.state.folders);
     });
     ipcRenderer.on(IpcChannels.LOADED_NOTES, (event, notes_) => {
       const notes = notes_.map(n => new NoteItem(n));
@@ -265,14 +264,17 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   }
 
   renderFolder(index): any {
-    const item = this.state.folders[index];
+    const folder = this.state.folders[index];
     return (
-      <ListItem button style={(item === this.state.selectedFolder) ? { backgroundColor: "lightgray" } : {}}>
+      <ListItem button
+                style={(folder === this.state.selectedFolder) ? { backgroundColor: "lightgray" } : {}}>
         <ListItemText disableTypography
-                      primary={<Typography variant="subheading" noWrap={true}>{item.label}</Typography>}
-                      onClick={e => this.folderListTextItem_onClick(item)} />
+                      primary={<Typography variant="subheading" noWrap={true}>{folder.label}</Typography>}
+                      onClick={e => this.folderListTextItem_onClick(folder)} />
         <ListItemSecondaryAction>
-          <IconButton aria-label="Delete Folder" onClick={e => this.deleteFolderButton_onClick(item)}><DeleteIcon /></IconButton>
+          <IconButton aria-label="Delete Folder" onClick={e => this.deleteFolderButton_onClick(folder)}>
+            <DeleteIcon />
+          </IconButton>
         </ListItemSecondaryAction>
       </ListItem>
     );
