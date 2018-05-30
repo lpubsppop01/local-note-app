@@ -39,7 +39,7 @@ export default class NoteEnumerator {
         }));
       }
       if (notes) {
-        notes.sort((a, b) => a.lastModifiedMs - b.lastModifiedMs).reverse();
+        notes.sort(NoteEnumerator.compareNotes).reverse();
         callback(notes);
       }
     });
@@ -89,13 +89,19 @@ export default class NoteEnumerator {
         }
       }
       if (word) {
-        hitNotes.sort((a, b) => a.lastModifiedMs - b.lastModifiedMs).reverse();
+        hitNotes.sort(NoteEnumerator.compareNotes).reverse();
         callback(hitNotes);
       } else {
-        allNotes.sort((a, b) => a.lastModifiedMs - b.lastModifiedMs).reverse();
+        allNotes.sort(NoteEnumerator.compareNotes).reverse();
         callback(allNotes);
       }
     });
+  }
+
+  private static compareNotes(note1: NoteItem, note2: NoteItem) {
+    const key1 = note1.lastModifiedMs + note1.startLineNumber * 0.1;
+    const key2 = note2.lastModifiedMs + note2.startLineNumber * 0.1;
+    return key1 - key2;
   }
 
 }
