@@ -15,7 +15,14 @@ export default class NoteSerializer {
   }
 
   static load(note: NoteItem): NoteLoadResult {
-    let content = fs.readFileSync(note.filePath, 'utf-8');
+    let content;
+    let hasError = false;
+    try {
+      content = fs.readFileSync(note.filePath, 'utf-8');
+    } catch (e) {
+      content = e.toString();
+      hasError = true;
+    }
     if (note.kind == NoteKind.Howm) {
       const lines = content.split(/\n|\r\n/);
       const partLines = lines.slice(note.startLineNumber - 1, note.endLineNumber);
@@ -29,7 +36,7 @@ export default class NoteSerializer {
     const stats = fs.statSync(note.filePath);
     const lastModified = moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss");
     const created = moment(stats.birthtime).format("YYYY/MM/DD HH:mm:ss");
-    return new NoteLoadResult({ content, lastModified, created });
+    return new NoteLoadResult({ content, lastModified, created, hasError });
   }
 
   static save(note: NoteItem, content: string): NoteSaveResult {

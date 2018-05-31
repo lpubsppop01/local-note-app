@@ -105,6 +105,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         lastModified: result.lastModified,
         created: result.created
       });
+      this.editor.updateOptions({ readOnly: result.hasError });
       if (this.state.searchWord) {
         const match = this.editor.getModel().findNextMatch(this.state.searchWord, this.editor.getModel().getPositionAt(0), false, false, null, false);
         if (match) {
@@ -203,6 +204,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
           lastModified: "",
           created: ""
         });
+        this.editor.updateOptions({ readOnly: true });
       } else {
         this.setState({
           deleteFolderDialogIsOpen: false,
@@ -230,6 +232,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       lastModified: "",
       created: ""
     });
+    this.editor.updateOptions({ readOnly: true });
     ipcRenderer.send(IpcChannels.LOAD_NOTES, clickedFolder.key, this.state.searchWord);  
   };
 
@@ -272,6 +275,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   editor_editorDidMount(editor, monaco) {
     editor.focus();
     editor.layout();
+    editor.updateOptions({ readOnly: true });
     ipcRenderer.send(IpcChannels.LOAD_FOLDERS);
     ipcRenderer.send(IpcChannels.LOAD_WIDTH_C1);
     ipcRenderer.send(IpcChannels.LOAD_WIDTH_C2);
@@ -401,7 +405,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
                           language="plaintext"
                           theme="vs-light"
                           value={this.state.editorValue}
-                          options={{ automaticLayout: true, lineNumbers: "off", minimap: { enabled: false } }}
+                          options={{ automaticLayout: true, lineNumbers: "off", minimap: { enabled: false }}}
                           requireConfig={{ url: "./vs/loader.js", baseUrl: document.baseURI }}
                           onChange={v => this.editor_onChange(v, true)}
                           editorDidMount={this.editor_editorDidMount.bind(this)} />
