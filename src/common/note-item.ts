@@ -30,4 +30,15 @@ export default class NoteItem {
     return `${this.filePath}:${this.startLineNumber.toString()}`;
   }
 
+  get infoMessage(): string {
+    let message = "";
+    message += `Label: ${this.label}\n`;
+    message += `Kind: ${this.kind}\n`;
+    message += `File path: ${this.filePath}\n`;
+    message += `Last modified (milliseconds): ${this.lastModifiedMs}\n`;
+    message += `Start line number: ${this.startLineNumber}\n`;
+    message += `End line number: ${this.endLineNumber}\n`;
+    return message;
+  }
+
 }

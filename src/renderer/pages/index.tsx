@@ -16,6 +16,7 @@ import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
 import DeleteIcon from '@material-ui/icons/Delete';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import SaveIcon from '@material-ui/icons/Save';
+import InfoIcon from '@material-ui/icons/Info';
 import { ipcRenderer } from 'electron';
 import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
@@ -265,6 +266,11 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     this.setState({ noteIsEdited: false });
   }
 
+  noteInfoButton_onClick = () => {
+    if (!this.state.selectedNote) return;
+    alert(this.state.selectedNote.infoMessage);
+  }
+
   editor_onChange(value: string, edited: boolean) {
     this.setState({
       editorValue: value,
@@ -398,6 +404,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
             <IconButton aria-label="Save Note" style={{ flex: "0 0 auto" }} disabled={!this.state.noteIsEdited}
                         onClick={e => this.saveButton_onClick()}>
               <SaveIcon />
+            </IconButton>
+            <IconButton aria-label="Note Info" style={{ flex: "0 0 auto" }} disabled={!this.state.selectedNote}
+                        onClick={e => this.noteInfoButton_onClick()}>
+              <InfoIcon />
             </IconButton>
           </div>
           <div style={{ height: "calc(100% - 64px)", marginTop: "16px" }}>
