@@ -33,6 +33,9 @@ module.exports = function(env) {
       p.push(new CopyWebpackPlugin([{
         from: 'node_modules/monaco-editor/min/vs',
         to: 'vs',
+      }, {
+        from: 'node_modules/vscode-ripgrep/bin',
+        to: 'bin'
       }]));
       if (PROD) {
         p.push(new LicensePack({

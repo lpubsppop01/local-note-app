@@ -16,12 +16,10 @@ export default class NoteEnumerator {
   }
 
   private static enumeratePlaneTextNotes(word: string, folder: FolderItem, callback: (notes: NoteItem[]) => void) {
-    let command;
-    if (word) {
-      command = `rg -l "${word}" "${folder.directoryPath}"`;
-    } else {
-      command = `rg --files "${folder.directoryPath}"`;
-    }
+    const rg = path.join(__dirname, '/bin/rg');
+    const command = word
+      ? `"${rg}" -l "${word}" "${folder.directoryPath}"`
+      : `"${rg}" --files "${folder.directoryPath}"`;
     child_process.exec(command, (error, stdout, stderr) => {
       const filePaths = stdout.split(/\n|\r\n/);
       const notes = new Array<NoteItem>();
@@ -46,12 +44,10 @@ export default class NoteEnumerator {
   }
 
   private static enumerateHowmNotes(word: string, folder: FolderItem, callback: (notes: NoteItem[]) => void) {
-    let command;
-    if (word) {
-      command = `rg -n "^= |${word}" "${folder.directoryPath}"`;
-    } else {
-      command = `rg -n "^= " "${folder.directoryPath}"`;
-    }
+    const rg = path.join(__dirname, '/bin/rg');
+    const command = word
+      ? `"${rg}" -n "^= |${word}" "${folder.directoryPath}"`
+      : `"${rg}" -n "^= " "${folder.directoryPath}"`;
     child_process.exec(command, (error, stdout, stderr) => {
       const allNotes = new Array<NoteItem>();
       const hitNotes = new Array<NoteItem>();
