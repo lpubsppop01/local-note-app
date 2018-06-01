@@ -5,6 +5,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import FormLabel from '@material-ui/core/FormLabel';
 import IconButton from '@material-ui/core/IconButton';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -14,9 +15,9 @@ import Typography from '@material-ui/core/Typography';
 import withStyles, { StyleRulesCallback, WithStyles } from '@material-ui/core/styles/withStyles';
 import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
 import DeleteIcon from '@material-ui/icons/Delete';
+import InfoIcon from '@material-ui/icons/Info';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import SaveIcon from '@material-ui/icons/Save';
-import InfoIcon from '@material-ui/icons/Info';
 import { ipcRenderer } from 'electron';
 import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
@@ -363,7 +364,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
            onMouseMoveCapture={e => this.root_onMouseMove(e)}
            onMouseUpCapture={e => this.root_onMouseUp(e)}>
         <div style={{ flex: "0 0 auto", width: `${this.state.widthC1}px` }}>
-          <div style={{ height: "48px", display: "flex", flexDirection: "row", justifyContent: "flex-end" }}>
+          <div style={{ height: "32px", display: "flex", flexDirection: "row", justifyContent: "flex-end" }}>
             <IconButton onClick={this.addFolderButton_onClick}><CreateNewFolderIcon /></IconButton>
           </div>
           <MyListView style={{ overflowY: "auto", height: "calc(100% - 64px)", marginTop: "16px" }}
@@ -381,12 +382,19 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
                        }} />
             <IconButton aria-label="Add Note" style={{ flex: "0 0 auto" }}><NoteAddIcon /></IconButton>
           </div>
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", height: "32px" }}>
+            {
+              this.state.selectedFolder && !this.state.isLoadingNotes
+              ? <FormLabel>{this.state.notes.length} notes</FormLabel>
+              : null
+            }
+          </div>
           {
             this.state.isLoadingNotes
-            ? <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "16px" }}>
+            ? <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "0px" }}>
                 <CircularProgress size={48} />
               </div>
-            : <MyListView style={{ overflowY: "auto", height: "calc(100% - 64px)", marginTop: "16px" }}
+            : <MyListView style={{ overflowY: "auto", height: "calc(100% - 64px)", paddingTop: "0px" }}
                           renderItem={(index) => this.renderNoteListItem(index)} itemHeight={48}
                           itemCount={this.state.notes ? this.state.notes.length : 0} />
           }
