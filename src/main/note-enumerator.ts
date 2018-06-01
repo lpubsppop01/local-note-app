@@ -17,10 +17,10 @@ export default class NoteEnumerator {
 
   private static enumeratePlaneTextNotes(word: string, folder: FolderItem, callback: (notes: NoteItem[]) => void) {
     const rg = path.join(__dirname, '/bin/rg');
-    const command = word
-      ? `"${rg}" -l "${word}" "${folder.directoryPath}"`
-      : `"${rg}" --files "${folder.directoryPath}"`;
-    child_process.exec(command, (error, stdout, stderr) => {
+    const args = word
+      ? [ '-l', word, folder.directoryPath ]
+      : [ '--files', folder.directoryPath ];
+    NoteEnumerator.exec(rg, args, (stdout) => {
       const filePaths = stdout.split(/\n|\r\n/);
       const notes = new Array<NoteItem>();
       for (let i = 0; i < filePaths.length; ++i) {
@@ -45,10 +45,10 @@ export default class NoteEnumerator {
 
   private static enumerateHowmNotes(word: string, folder: FolderItem, callback: (notes: NoteItem[]) => void) {
     const rg = path.join(__dirname, '/bin/rg');
-    const command = word
-      ? `"${rg}" -n "^= |${word}" "${folder.directoryPath}"`
-      : `"${rg}" -n "^= " "${folder.directoryPath}"`;
-    child_process.exec(command, (error, stdout, stderr) => {
+    const args = word
+      ? [ '-n', `^= |${word}`, folder.directoryPath ]
+      : [ '-n', '^= ', folder.directoryPath ];
+    NoteEnumerator.exec(rg, args, (stdout) => {
       const allNotes = new Array<NoteItem>();
       const hitNotes = new Array<NoteItem>();
       const lines = stdout.split(/\n|\r\n/);
@@ -91,6 +91,20 @@ export default class NoteEnumerator {
         allNotes.sort(NoteEnumerator.compareNotes).reverse();
         callback(allNotes);
       }
+    });
+  }
+
+  private static exec(command, args, callback) {
+    // child_process.exec() not pass whole of huge result
+    // cf. https://stackoverflow.com/questions/21188815/stdout-of-node-js-child-process-exec-is-cut-short
+    var proc = child_process.spawn(command, args);
+    var list = [];
+    proc.stdout.setEncoding('utf8');
+    proc.stdout.on('data', (chunk) => {
+      list.push(chunk);
+    });
+    proc.stdout.on('end', () => {
+      callback(list.join(''));
     });
   }
 
