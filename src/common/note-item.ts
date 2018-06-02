@@ -5,6 +5,7 @@ export enum NoteKind {
 export default class NoteItem {
 
   label: string;
+  subLabel: string;
   kind: NoteKind;
   filePath: string;
   lastModifiedMs: number;
@@ -18,6 +19,7 @@ export default class NoteItem {
   clone(): NoteItem {
     return new NoteItem({
       label: this.label,
+      subLabel: this.subLabel,
       kind: this.kind,
       filePath: this.filePath,
       lastModifiedMs: this.lastModifiedMs,
@@ -33,6 +35,7 @@ export default class NoteItem {
   get infoMessage(): string {
     let message = "";
     message += `Label: ${this.label}\n`;
+    message += `Sub label: ${this.subLabel}`;
     message += `Kind: ${this.kind}\n`;
     message += `File path: ${this.filePath}\n`;
     message += `Last modified (milliseconds): ${this.lastModifiedMs}\n`;

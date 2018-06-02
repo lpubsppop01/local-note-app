@@ -27,9 +27,11 @@ export default class NoteEnumerator {
         if (!filePaths[i]) continue;
         const label = path.basename(filePaths[i]);
         const stats = fs.statSync(filePaths[i]);
-        const lastModifiedMs = stats.mtime.getTime();
+        const lastModifiedMs = stats.mtimeMs;
+        const subLabel = this.getSubLabel(stats.mtime, filePaths[i], folder);
         notes.push(new NoteItem({
           label,
+          subLabel,
           kind: NoteKind.PlaneText,
           filePath: filePaths[i],
           lastModifiedMs,
@@ -61,8 +63,10 @@ export default class NoteEnumerator {
           const title = titleMatch[3];
           const stats = fs.statSync(filePath);
           const lastModifiedMs = stats.mtime.getTime();
+          const subLabel = this.getSubLabel(stats.mtime, filePath, folder);
           const currNote = new NoteItem({
             label: title,
+            subLabel,
             kind: NoteKind.Howm,
             filePath,
             lastModifiedMs,
@@ -106,6 +110,26 @@ export default class NoteEnumerator {
     proc.stdout.on('end', () => {
       callback(list.join(''));
     });
+  }
+
+  private static getSubLabel(mtime: Date, filePath: string, folder: FolderItem): string {
+    let subLabel = this.formatDateToYYYYMMDD(mtime);
+    const relPath = path.dirname(filePath).substr(folder.directoryPath.length + 1);
+    if (relPath) {
+      subLabel += ', ' + relPath;
+    }
+    return subLabel;
+  }
+
+  private static formatDateToYYYYMMDD(date: Date): string {
+    const yyyy = this.zeroPadding(date.getFullYear(), 4);
+    const mm = this.zeroPadding(date.getMonth() + 1, 2);
+    const dd = this.zeroPadding(date.getDate(), 2);
+    return yyyy + '/' + mm + '/' + dd;
+  }
+
+  private static zeroPadding(number: number, digits: number): string {
+    return ('0'.repeat(digits - 1) + number).slice(-digits);
   }
 
   private static compareNotes(note1: NoteItem, note2: NoteItem) {

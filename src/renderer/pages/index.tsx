@@ -350,7 +350,8 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       <ListItem button onClick={e => this.noteListItem_onClick(note)}
                 style={noteIsSelected ? { backgroundColor: "lightgray" } : {}}>
         <ListItemText disableTypography
-                      primary={<Typography variant="subheading" noWrap={true}>{note.label}</Typography>} />
+                      primary={<Typography variant="subheading" noWrap={true}>{note.label}</Typography>}
+                      secondary={<Typography variant="caption" noWrap={true}>{note.subLabel}</Typography>} />
         <ListItemSecondaryAction>
           <IconButton aria-label="Delete Note" onClick={e => this.deleteNoteButton_onClick(note)}><DeleteIcon /></IconButton>
         </ListItemSecondaryAction>
@@ -395,7 +396,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
                 <CircularProgress size={48} />
               </div>
             : <MyListView style={{ overflowY: "auto", height: "calc(100% - 64px)", paddingTop: "0px" }}
-                          renderItem={(index) => this.renderNoteListItem(index)} itemHeight={48}
+                          renderItem={(index) => this.renderNoteListItem(index)} itemHeight={64}
                           itemCount={this.state.notes ? this.state.notes.length : 0} />
           }
         </div>
