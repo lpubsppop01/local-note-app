@@ -375,27 +375,27 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         <div style={{ width: "16px", cursor: "col-resize" }}
              onMouseDownCapture={e => this.widthResizerC1_onMouseDown(e)} />
         <div style={{ flex: "0 0 auto", width: `${this.state.widthC2}px` }}>
-          <div style={{ height: "48px", display: "flex", flexDirection: "row", alignItems: "center" }}>
+          <div style={{ height: "68px", display: "flex", flexDirection: "row", alignItems: "top" }}>
             <TextField label="Search" type="search" style={{ flex: "1 1 auto" }}
                        inputRef={(input) => {
                          this.searchInput = input;
                          (input||{}).onsearch = this.searchInput_onsearch;
-                       }} />
+                       }}
+                       helperText={
+                         this.state.selectedFolder && !this.state.isLoadingNotes
+                         ? this.state.notes.length + ' notes'
+                         : null
+                       }/>
             <IconButton aria-label="Add Note" style={{ flex: "0 0 auto" }}><NoteAddIcon /></IconButton>
-          </div>
-          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", height: "32px" }}>
-            {
-              this.state.selectedFolder && !this.state.isLoadingNotes
-              ? <FormLabel>{this.state.notes.length} notes</FormLabel>
-              : null
-            }
           </div>
           {
             this.state.isLoadingNotes
-            ? <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "0px" }}>
-                <CircularProgress size={48} />
+            ? <div style={{ display: "flex", flexDirection: "column", alignItems: "center",
+                            marginTop: "8px", paddingTop: "0" }}>
+                <CircularProgress size={64} />
               </div>
-            : <MyListView style={{ overflowY: "auto", height: "calc(100% - 64px)", paddingTop: "0px" }}
+            : <MyListView style={{ overflowY: "auto", height: "calc(100% - 76px)",
+                                   marginTop: "8px", paddingTop: "0" }}
                           renderItem={(index) => this.renderNoteListItem(index)} itemHeight={64}
                           itemCount={this.state.notes ? this.state.notes.length : 0} />
           }
