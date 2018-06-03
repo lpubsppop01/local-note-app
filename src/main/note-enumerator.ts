@@ -28,7 +28,7 @@ export default class NoteEnumerator {
         const label = path.basename(filePaths[i]);
         const stats = fs.statSync(filePaths[i]);
         const lastModifiedMs = stats.mtimeMs;
-        const subLabel = this.getSubLabel(stats.mtime, filePaths[i], folder);
+        const subLabel = this.getSubLabel(stats.mtime, filePaths[i], folder, /* includesFilename: */ false);
         notes.push(new NoteItem({
           label,
           subLabel,
@@ -63,7 +63,7 @@ export default class NoteEnumerator {
           const title = titleMatch[3];
           const stats = fs.statSync(filePath);
           const lastModifiedMs = stats.mtime.getTime();
-          const subLabel = this.getSubLabel(stats.mtime, filePath, folder);
+          const subLabel = this.getSubLabel(stats.mtime, filePath, folder, /* includesFilename: */ true);
           const currNote = new NoteItem({
             label: title,
             subLabel,
@@ -112,9 +112,11 @@ export default class NoteEnumerator {
     });
   }
 
-  private static getSubLabel(mtime: Date, filePath: string, folder: FolderItem): string {
+  private static getSubLabel(mtime: Date, filePath: string, folder: FolderItem, includesFilename: boolean): string {
     let subLabel = this.formatDateToYYYYMMDD(mtime);
-    const relPath = path.dirname(filePath).substr(folder.directoryPath.length + 1);
+    const relPath = includesFilename
+      ? filePath.substr(folder.directoryPath.length + 1)
+      : path.dirname(filePath).substr(folder.directoryPath.length + 1);
     if (relPath) {
       subLabel += ', ' + relPath;
     }
