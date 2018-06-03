@@ -135,9 +135,12 @@ export default class NoteEnumerator {
   }
 
   private static compareNotes(note1: NoteItem, note2: NoteItem) {
-    const key1 = note1.lastModifiedMs + note1.startLineNumber * 0.1;
-    const key2 = note2.lastModifiedMs + note2.startLineNumber * 0.1;
-    return key1 - key2;
+    if (note1.lastModifiedMs !== note2.lastModifiedMs) {
+      return note1.lastModifiedMs - note2.lastModifiedMs;
+    } else if (note1.filePath !== note2.filePath) {
+      return note1.filePath < note2.filePath ? -1 : 1;
+    }
+    return note1.startLineNumber - note2.startLineNumber;
   }
 
 }
