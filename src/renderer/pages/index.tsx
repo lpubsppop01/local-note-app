@@ -5,7 +5,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import FormLabel from '@material-ui/core/FormLabel';
 import IconButton from '@material-ui/core/IconButton';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -147,6 +146,13 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         this.setState({ lastModified: result.lastModified });
       }
     });
+    ipcRenderer.on(IpcChannels.ADDED_NOTE, (event, note_) => {
+      const note = new NoteItem(note_);
+      const notes = new Array<NoteItem>();
+      notes.push(note);
+      this.state.notes.forEach(n => notes.push(n));
+      this.setState({ notes });
+    });
     ipcRenderer.on(IpcChannels.LOADED_WIDTH_C1, (event, widthC1: number) => {
       this.setState({ widthC1 });
     });
@@ -166,7 +172,8 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         key: result.path,
         label: PathUtility.getFilename(result.path),
         directoryPath: result.path,
-        isHowmDirectory: result.isHowmDirectory
+        isHowmDirectory: result.isHowmDirectory,
+        filenameFormat: result.filenameFormat
       });
       const folders = this.state.folders.concat(newFolderItem);
       this.setState({
@@ -236,6 +243,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     });
     this.editor.updateOptions({ readOnly: true });
     ipcRenderer.send(IpcChannels.LOAD_NOTES, clickedFolder.key, this.state.searchWord);  
+  };
+
+  addNoteButton_onClick = (e) => {
+    ipcRenderer.send(IpcChannels.ADD_NOTE, this.state.selectedFolder.key);
   };
 
   deleteNoteButton_onClick = (clickedNote: NoteItem) => {
@@ -386,7 +397,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
                          ? this.state.notes.length + ' notes'
                          : null
                        }/>
-            <IconButton aria-label="Add Note" style={{ flex: "0 0 auto" }}><NoteAddIcon /></IconButton>
+            <IconButton aria-label="Add Note" style={{ flex: "0 0 auto" }}
+                        onClick={this.addNoteButton_onClick}>
+              <NoteAddIcon />
+            </IconButton>
           </div>
           {
             this.state.isLoadingNotes

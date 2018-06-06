@@ -4,6 +4,7 @@ export default class FolderItem {
   label: string;
   directoryPath: string;
   isHowmDirectory: boolean;
+  filenameFormat: string;
 
   constructor(init?: Partial<FolderItem>) {
     Object.assign(this, init);

@@ -2,9 +2,11 @@ export namespace IpcChannels {
 
   export const SAVE_FOLDERS = "save-folders";
   export const SAVE_NOTE = "save-note";
+  export const ADD_NOTE = "add-note";
   export const SAVE_WIDTH_C1 = "save-width-c1";
   export const SAVE_WIDTH_C2 = "save-width-c2";
   export const SAVED_NOTE = "saved-note";
+  export const ADDED_NOTE = "added-note";
   export const LOAD_FOLDERS = "load-folders";
   export const LOAD_NOTES = "load-notes";
   export const LOAD_NOTE = "load-note";

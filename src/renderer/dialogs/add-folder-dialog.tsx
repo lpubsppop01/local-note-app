@@ -22,14 +22,16 @@ interface Props {
 
 interface State {
   open: boolean;
-  path: string;
+  directoryPath: string;
   isHowmDirectory: boolean;
+  filenameFormat: string;
 }
 
 export class AddFolderDialogResult {
 
   path: string;
   isHowmDirectory: boolean;
+  filenameFormat: string;
 
   constructor(init?: Partial<AddFolderDialogResult>) {
     Object.assign(this, init);
@@ -43,12 +45,13 @@ export default class AddFolderDialog extends React.Component<Props, State> {
     super(props);
     this.state = {
       open: props.open,
-      path: "",
-      isHowmDirectory: false
+      directoryPath: "",
+      isHowmDirectory: true,
+      filenameFormat: "%Y/%m/%Y-%m-%d-%H%M%S.howm"
     };
 
     ipcRenderer.on(IpcChannels.DIR_PATH_TO_OPEN, (event, path: string) => {
-      this.setState({ path });
+      this.setState({ directoryPath: path });
     });
   }
 
@@ -56,8 +59,9 @@ export default class AddFolderDialog extends React.Component<Props, State> {
     if (nextProps.open) {
       this.setState({
         open: true,
-        path: "",
-        isHowmDirectory: false
+        directoryPath: "",
+        isHowmDirectory: true,
+        filenameFormat: "%Y/%m/%Y-%m-%d-%H%M%S.howm"
       });
     } else {
       this.setState({ open: false });
@@ -68,14 +72,15 @@ export default class AddFolderDialog extends React.Component<Props, State> {
     ipcRenderer.send(IpcChannels.SHOW_OPEN_DIR_DIALOG);
   };
 
-  isHowmDirCheckbox_onChange = (e) => {
+  isHowmDirectoryCheckbox_onChange = (e) => {
     this.setState({ isHowmDirectory: e.target.checked });
   };
 
   okButton_onClick = (e) => {
     const result = new AddFolderDialogResult({
-      path: this.state.path,
-      isHowmDirectory: this.state.isHowmDirectory
+      path: this.state.directoryPath,
+      isHowmDirectory: this.state.isHowmDirectory,
+      filenameFormat: this.state.filenameFormat
     });
     this.props.onClose(result);
   };
@@ -88,8 +93,8 @@ export default class AddFolderDialog extends React.Component<Props, State> {
           <div style={{ width: "552px", display: "flex", flexDirection: "column" }}>
             <div style={{ width: "552px", flex: "0 0 auto" }}>
               <FormControl>
-                <InputLabel htmlFor="adornment-dir-path">Path</InputLabel>
-                <Input autoFocus id="adornment-dir-path" value={this.state.path} endAdornment={
+                <InputLabel htmlFor="adornment-directory-path">Directory path</InputLabel>
+                <Input autoFocus id="adornment-directory-path" value={this.state.directoryPath} endAdornment={
                   <InputAdornment position="end">
                     <IconButton onClick={this.folderOpen_onClick}>
                       <FolderOpenIcon />
@@ -98,9 +103,16 @@ export default class AddFolderDialog extends React.Component<Props, State> {
                 } style={{ width: "552px" }} />
               </FormControl>
             </div>
-            <div style={{ width: "552px", flex: "0 0 auto" }}>
+            <div style={{ width: "552px", flex: "0 0 auto", marginTop: "16px" }}>
+              <FormControl>
+                <InputLabel htmlFor="adornment-filename-format">New filename format</InputLabel>
+                <Input id="adornment-filename-format"
+                       value={this.state.filenameFormat} style={{ width: "552px" }} />
+              </FormControl>
+            </div>
+            <div style={{ width: "552px", flex: "0 0 auto", marginTop: "16px" }}>
               <FormControlLabel control={
-                <Checkbox checked={this.state.isHowmDirectory} onChange={this.isHowmDirCheckbox_onChange} />
+                <Checkbox checked={this.state.isHowmDirectory} onChange={this.isHowmDirectoryCheckbox_onChange} />
               } label="howm"/>
             </div>
           </div>

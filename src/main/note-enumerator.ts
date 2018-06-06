@@ -1,6 +1,7 @@
 import * as child_process from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import DateUtility from "../common/date-utility";
 import FolderItem from "../common/folder-item";
 import NoteItem, { NoteKind } from "../common/note-item";
 
@@ -112,8 +113,8 @@ export default class NoteEnumerator {
     });
   }
 
-  private static getSubLabel(mtime: Date, filePath: string, folder: FolderItem, includesFilename: boolean): string {
-    let subLabel = this.formatDateToYYYYMMDD(mtime);
+  static getSubLabel(mtime: Date, filePath: string, folder: FolderItem, includesFilename: boolean): string {
+    let subLabel = DateUtility.formatElispLike('%Y/%m/%d', mtime);
     const relPath = includesFilename
       ? filePath.substr(folder.directoryPath.length + 1)
       : path.dirname(filePath).substr(folder.directoryPath.length + 1);
@@ -121,17 +122,6 @@ export default class NoteEnumerator {
       subLabel += ', ' + relPath;
     }
     return subLabel;
-  }
-
-  private static formatDateToYYYYMMDD(date: Date): string {
-    const yyyy = this.zeroPadding(date.getFullYear(), 4);
-    const mm = this.zeroPadding(date.getMonth() + 1, 2);
-    const dd = this.zeroPadding(date.getDate(), 2);
-    return yyyy + '/' + mm + '/' + dd;
-  }
-
-  private static zeroPadding(number: number, digits: number): string {
-    return ('0'.repeat(digits - 1) + number).slice(-digits);
   }
 
   private static compareNotes(note1: NoteItem, note2: NoteItem) {

@@ -3,10 +3,12 @@ import * as fs from "fs";
 import * as path from "path";
 import FolderItem from '../common/folder-item';
 import { IpcChannels } from '../common/ipc-channels';
-import NoteItem from '../common/note-item';
+import NoteItem, { NoteKind } from '../common/note-item';
+import DateUtility from '../common/date-utility';
 import DirectoryUtility from './directory-utility';
 import NoteEnumerator from './note-enumerator';
 import NoteSerializer from './note-serializer';
+import * as os from 'os';
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -67,6 +69,32 @@ app.on("ready", () => {
     const result = NoteSerializer.save(note, contentValue);
     event.sender.send(IpcChannels.SAVED_NOTE, result);
   });
+  ipcMain.on(IpcChannels.ADD_NOTE, (event, folderKey: string) => {
+    const folder = currFolders.find(folder => folder.key == folderKey);
+    const now = new Date();
+    const filename = DateUtility.formatElispLike(folder.filenameFormat, now);
+    const filePath = path.join(folder.directoryPath, filename);
+    if (fs.existsSync(filePath)) return;
+    DirectoryUtility.mkdirPSync(path.dirname(filePath));
+    let content = "";
+    let label = "";
+    let subLabel = "";
+    let kind = NoteKind.PlaneText;
+    if (folder.isHowmDirectory) {
+      content += "= New Note\r\n";
+      content += DateUtility.formatElispLike("[%Y-%m-%d %H:%M] \r\n", now);
+      content += "\r\n";
+      label = "New Note";
+      subLabel = NoteEnumerator.getSubLabel(now, filePath, folder, /* includesFilename: */ true);
+      kind = NoteKind.Howm;
+    }
+    fs.appendFileSync(filePath, content);
+    const note = new NoteItem({
+      label, subLabel, kind, filePath,
+      lastModifiedMs: now.getTime(), startLineNumber: 1
+    });
+    event.sender.send(IpcChannels.ADDED_NOTE, note);
+  })
   ipcMain.on(IpcChannels.SHOW_OPEN_DIR_DIALOG, (event) => {
     // When first argument is 'this', 'openDirectory' not works
     const filePaths = dialog.showOpenDialog(null, {
