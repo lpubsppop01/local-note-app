@@ -59,7 +59,8 @@ type State = {
   lastModified: string,
   created: string,
   widthC1: number,
-  widthC2: number
+  widthC2: number,
+  osIsWindows: boolean
 };
 
 class Index extends React.Component<WithStyles<ClassNames>, State> {
@@ -86,7 +87,8 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       lastModified: "",
       created: "",
       widthC1: 200,
-      widthC2: 300
+      widthC2: 300,
+      osIsWindows: false
     };
 
     ipcRenderer.on(IpcChannels.LOADED_FOLDERS, (event, folders_) => {
@@ -158,6 +160,9 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     });
     ipcRenderer.on(IpcChannels.LOADED_WIDTH_C2, (event, widthC2: number) => {
       this.setState({ widthC2 });
+    });
+    ipcRenderer.on(IpcChannels.OS_IS_WINDOWS, (event, osIsWindows: boolean) => {
+      this.setState({ osIsWindows });
     });
   }
 
@@ -297,6 +302,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     ipcRenderer.send(IpcChannels.LOAD_FOLDERS);
     ipcRenderer.send(IpcChannels.LOAD_WIDTH_C1);
     ipcRenderer.send(IpcChannels.LOAD_WIDTH_C2);
+    ipcRenderer.send(IpcChannels.CHECK_ENV);
     this.editor = editor;
   }
 
@@ -446,7 +452,8 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         </div>
 
         <AddFolderDialog open={this.state.addFolderDialogIsOpen}
-                         onClose={result => this.addFolderDialog_onClose(result)} />
+                         onClose={result => this.addFolderDialog_onClose(result)}
+                         osIsWindows={this.state.osIsWindows} />
 
         <Dialog
           open={this.state.deleteFolderDialogIsOpen}

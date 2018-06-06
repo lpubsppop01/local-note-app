@@ -18,10 +18,12 @@ import { IpcChannels } from '../../common/ipc-channels';
 interface Props {
   open: boolean;
   onClose: (result: AddFolderDialogResult) => void;
+  osIsWindows?: boolean;
 }
 
 interface State {
   open: boolean;
+  osIsWindows: boolean;
   directoryPath: string;
   isHowmDirectory: boolean;
   filenameFormat: string;
@@ -45,6 +47,7 @@ export default class AddFolderDialog extends React.Component<Props, State> {
     super(props);
     this.state = {
       open: props.open,
+      osIsWindows: props.osIsWindows ? props.osIsWindows : false,
       directoryPath: "",
       isHowmDirectory: true,
       filenameFormat: "%Y/%m/%Y-%m-%d-%H%M%S.howm"
@@ -59,6 +62,7 @@ export default class AddFolderDialog extends React.Component<Props, State> {
     if (nextProps.open) {
       this.setState({
         open: true,
+        osIsWindows: nextProps.osIsWindows ? nextProps.osIsWindows : this.state.osIsWindows,
         directoryPath: "",
         isHowmDirectory: true,
         filenameFormat: "%Y/%m/%Y-%m-%d-%H%M%S.howm"
@@ -117,14 +121,17 @@ export default class AddFolderDialog extends React.Component<Props, State> {
             </div>
           </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={e => this.props.onClose(null)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={this.okButton_onClick} color="primary" autoFocus>
-            Ok
-          </Button>
-        </DialogActions>
+        {
+          this.state.osIsWindows
+          ? <DialogActions>
+              <Button onClick={this.okButton_onClick} color="primary" autoFocus>Ok</Button>
+              <Button onClick={e => this.props.onClose(null)} color="primary">Cancel</Button>
+            </DialogActions>
+          : <DialogActions>
+              <Button onClick={e => this.props.onClose(null)} color="primary">Cancel</Button>
+              <Button onClick={this.okButton_onClick} color="primary" autoFocus>Ok</Button>
+            </DialogActions>
+        }
       </Dialog>
     );
   }

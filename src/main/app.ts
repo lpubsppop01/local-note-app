@@ -149,4 +149,8 @@ app.on("ready", () => {
       event.sender.send(IpcChannels.LOADED_WIDTH_C2, windowState.widthC2);
     }
   });
+  ipcMain.on(IpcChannels.CHECK_ENV, (event) => {
+    const osIsWindows = os.type().match('Windows') !== null;
+    event.sender.send(IpcChannels.OS_IS_WINDOWS, osIsWindows);
+  });
 });

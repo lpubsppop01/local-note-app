@@ -19,5 +19,7 @@ export namespace IpcChannels {
   export const LOADED_WIDTH_C2 = "loaded-width-c2";
   export const SHOW_OPEN_DIR_DIALOG = "show-open-dir-dialog";
   export const DIR_PATH_TO_OPEN = "dir-path-to-open";
+  export const CHECK_ENV = "check-env";
+  export const OS_IS_WINDOWS = "os-is-windows";
 
 }
