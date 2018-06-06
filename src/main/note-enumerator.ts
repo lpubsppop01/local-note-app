@@ -17,7 +17,8 @@ export default class NoteEnumerator {
   }
 
   private static enumeratePlaneTextNotes(word: string, folder: FolderItem, callback: (notes: NoteItem[]) => void) {
-    const rg = path.join(__dirname, '/bin/rg');
+    //const rg = path.join(__dirname, '/bin/rg');
+    const rg = 'rg';
     const args = word
       ? [ '-l', word, folder.directoryPath ]
       : [ '--files', folder.directoryPath ];
@@ -47,7 +48,8 @@ export default class NoteEnumerator {
   }
 
   private static enumerateHowmNotes(word: string, folder: FolderItem, callback: (notes: NoteItem[]) => void) {
-    const rg = path.join(__dirname, '/bin/rg');
+    //const rg = path.join(__dirname, '/bin/rg');
+    const rg = 'rg';
     const args = word
       ? [ '-n', `^= |${word}`, folder.directoryPath ]
       : [ '-n', '^= ', folder.directoryPath ];
