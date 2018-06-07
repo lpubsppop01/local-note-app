@@ -23,6 +23,7 @@ import MonacoEditor from 'react-monaco-editor';
 import FolderItem from '../../common/folder-item';
 import { IpcChannels } from '../../common/ipc-channels';
 import IpcLoadNoteResult from '../../common/ipc-load-note-result';
+import IpcLoadNotesResult from '../../common/ipc-load-notes-result';
 import IpcSaveNoteResult from '../../common/ipc-save-note-result';
 import NoteItem from '../../common/note-item';
 import MyListView from '../controls/my-list-view';
@@ -51,6 +52,7 @@ type State = {
   selectedFolder: FolderItem;
   targetFolder: FolderItem;
   notes: NoteItem[];
+  elapsedMs: number;
   selectedNote: NoteItem;
   targetNote: NoteItem;
   searchWord: string;
@@ -79,6 +81,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       selectedFolder: null,
       targetFolder: null,
       notes: new Array<NoteItem>(),
+      elapsedMs: 0,
       selectedNote: null,
       targetNote: null,
       searchWord: "",
@@ -95,9 +98,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       const folders = folders_.map(f => new FolderItem(f));
       this.setState({ folders });
     });
-    ipcRenderer.on(IpcChannels.LOADED_NOTES, (event, notes_) => {
-      const notes = notes_.map(n => new NoteItem(n));
-      this.setState({ notes, isLoadingNotes: false });
+    ipcRenderer.on(IpcChannels.LOADED_NOTES, (event, result_) => {
+      const result = new IpcLoadNotesResult(result_);
+      const notes = result.notes.map(n => new NoteItem(n));
+      this.setState({ notes, elapsedMs: result.elapsedMs, isLoadingNotes: false });
     });
     ipcRenderer.on(IpcChannels.LOADED_NOTE, (event, result_) => {
       const result = new IpcLoadNoteResult(result_);
@@ -400,7 +404,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
                        }}
                        helperText={
                          this.state.selectedFolder && !this.state.isLoadingNotes
-                         ? this.state.notes.length + ' notes'
+                         ? `${this.state.notes.length} notes (${this.state.elapsedMs} milliseconds)`
                          : null
                        }/>
             <IconButton aria-label="Add Note" style={{ flex: "0 0 auto" }}

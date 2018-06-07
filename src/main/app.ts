@@ -9,6 +9,7 @@ import DirectoryUtility from './directory-utility';
 import NoteEnumerator from './note-enumerator';
 import NoteSerializer from './note-serializer';
 import * as os from 'os';
+import IpcLoadNotesResult from "../common/ipc-load-notes-result";
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -129,8 +130,14 @@ app.on("ready", () => {
   });
   ipcMain.on(IpcChannels.LOAD_NOTES, (event, folderKey: string, word: string) => {
     const matchedFolder = currFolders.find(folder => folder.key == folderKey);
+    const startMs = Date.now();
     NoteEnumerator.enumerate(matchedFolder, word, notes => {
-      event.sender.send(IpcChannels.LOADED_NOTES, notes);
+      const endMs = Date.now();
+      const result = new IpcLoadNotesResult({
+        notes,
+        elapsedMs: endMs - startMs
+      });
+      event.sender.send(IpcChannels.LOADED_NOTES, result);
     });
   });
   ipcMain.on(IpcChannels.SAVE_WIDTH_C1, (event, widthC1: number) => {
