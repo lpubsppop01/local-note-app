@@ -1,16 +1,16 @@
-export default class NoteLoadResult {
+export default class IpcLoadNoteResult {
 
   content: string;
   lastModified: string;
   created: string;
   hasError: boolean;
 
-  constructor(init?: Partial<NoteLoadResult>) {
+  constructor(init?: Partial<IpcLoadNoteResult>) {
     Object.assign(this, init);
   }
 
-  clone(): NoteLoadResult {
-    return new NoteLoadResult({
+  clone(): IpcLoadNoteResult {
+    return new IpcLoadNoteResult({
       content: this.content,
       lastModified: this.lastModified,
       created: this.created,

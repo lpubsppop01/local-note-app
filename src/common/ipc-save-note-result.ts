@@ -1,4 +1,4 @@
-export default class NoteSaveResult {
+export default class IpcSaveNoteResult {
 
   key: string;
   filePath: string;
@@ -6,12 +6,12 @@ export default class NoteSaveResult {
   endLineNumber?: number;
   lastModified: string;
 
-  constructor(init?: Partial<NoteSaveResult>) {
+  constructor(init?: Partial<IpcSaveNoteResult>) {
     Object.assign(this, init);
   }
 
-  clone(): NoteSaveResult {
-    return new NoteSaveResult({
+  clone(): IpcSaveNoteResult {
+    return new IpcSaveNoteResult({
       filePath: this.filePath,
       startLineNumber: this.startLineNumber,
       endLineNumber: this.endLineNumber,

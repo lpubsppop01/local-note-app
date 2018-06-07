@@ -22,9 +22,9 @@ import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import FolderItem from '../../common/folder-item';
 import { IpcChannels } from '../../common/ipc-channels';
+import IpcLoadNoteResult from '../../common/ipc-load-note-result';
+import IpcSaveNoteResult from '../../common/ipc-save-note-result';
 import NoteItem from '../../common/note-item';
-import NoteLoadResult from '../../common/note-load-result';
-import NoteSaveResult from '../../common/note-save-result';
 import MyListView from '../controls/my-list-view';
 import AddFolderDialog, { AddFolderDialogResult } from '../dialogs/add-folder-dialog';
 import PathUtility from '../utilities/path-utility';
@@ -100,7 +100,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       this.setState({ notes, isLoadingNotes: false });
     });
     ipcRenderer.on(IpcChannels.LOADED_NOTE, (event, result_) => {
-      const result = new NoteLoadResult(result_);
+      const result = new IpcLoadNoteResult(result_);
       this.editor_onChange(result.content, false);
       this.setState({
         editorValue: result.content,
@@ -118,7 +118,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         }
       }
     });
-    ipcRenderer.on(IpcChannels.SAVED_NOTE, (event, result: NoteSaveResult) => {
+    ipcRenderer.on(IpcChannels.SAVED_NOTE, (event, result: IpcSaveNoteResult) => {
       if (result.endLineNumber) {
         let editedNote: NoteItem = null;
         if (this.state.selectedNote && this.state.selectedNote.key === result.key) {

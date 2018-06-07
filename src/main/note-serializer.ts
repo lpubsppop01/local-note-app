@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as moment from 'moment';
+import IpcLoadNoteResult from "../common/ipc-load-note-result";
+import IpcSaveNoteResult from "../common/ipc-save-note-result";
 import NoteItem, { NoteKind } from "../common/note-item";
-import NoteLoadResult from "../common/note-load-result";
-import NoteSaveResult from "../common/note-save-result";
 
 export default class NoteSerializer {
 
@@ -14,7 +14,7 @@ export default class NoteSerializer {
     return lineSep;
   }
 
-  static load(note: NoteItem): NoteLoadResult {
+  static load(note: NoteItem): IpcLoadNoteResult {
     let content;
     let hasError = false;
     try {
@@ -36,10 +36,10 @@ export default class NoteSerializer {
     const stats = fs.statSync(note.filePath);
     const lastModified = moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss");
     const created = moment(stats.birthtime).format("YYYY/MM/DD HH:mm:ss");
-    return new NoteLoadResult({ content, lastModified, created, hasError });
+    return new IpcLoadNoteResult({ content, lastModified, created, hasError });
   }
 
-  static save(note: NoteItem, content: string): NoteSaveResult {
+  static save(note: NoteItem, content: string): IpcSaveNoteResult {
     if (note.kind === NoteKind.Howm) {
       const editedLines = content.split(/\n|\r\n/);
       const srcFileText = fs.readFileSync(note.filePath, 'utf-8');
@@ -58,7 +58,7 @@ export default class NoteSerializer {
       const destFileText = destLines.join(lineSep);
       fs.writeFileSync(note.filePath, destFileText);
       const stats = fs.statSync(note.filePath);
-      const result = new NoteSaveResult({
+      const result = new IpcSaveNoteResult({
         key: note.key,
         filePath: note.filePath,
         startLineNumber: note.startLineNumber,
@@ -69,7 +69,7 @@ export default class NoteSerializer {
     } else {
       fs.writeFileSync(note.filePath, content);
       const stats = fs.statSync(note.filePath);
-      const result = new NoteSaveResult({
+      const result = new IpcSaveNoteResult({
         key: note.key,
         filePath: note.filePath,
         startLineNumber: note.startLineNumber,
