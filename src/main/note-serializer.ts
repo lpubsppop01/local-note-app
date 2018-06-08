@@ -1,8 +1,8 @@
 import * as fs from "fs";
-import * as moment from 'moment';
 import IpcLoadNoteResult from "../common/ipc-load-note-result";
 import IpcSaveNoteResult from "../common/ipc-save-note-result";
 import NoteItem, { NoteKind } from "../common/note-item";
+import DateUtility from "../common/date-utility";
 
 export default class NoteSerializer {
 
@@ -34,8 +34,8 @@ export default class NoteSerializer {
       }
     }
     const stats = fs.statSync(note.filePath);
-    const lastModified = moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss");
-    const created = moment(stats.birthtime).format("YYYY/MM/DD HH:mm:ss");
+    const lastModified = DateUtility.formatLikeElisp("%Y/%m/%d %H:%M:%S", stats.mtime);
+    const created = DateUtility.formatLikeElisp("%Y/%m/%d %H:%M:%S", stats.birthtime);
     return new IpcLoadNoteResult({ content, lastModified, created, hasError });
   }
 
