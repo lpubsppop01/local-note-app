@@ -1,15 +1,15 @@
 import { BrowserWindow, app, dialog, ipcMain } from "electron";
 import * as fs from "fs";
+import * as os from 'os';
 import * as path from "path";
+import DateUtility from '../common/date-utility';
 import FolderItem from '../common/folder-item';
 import { IpcChannels } from '../common/ipc-channels';
+import IpcLoadNotesResult from "../common/ipc-load-notes-result";
 import NoteItem, { NoteKind } from '../common/note-item';
-import DateUtility from '../common/date-utility';
 import DirectoryUtility from './directory-utility';
 import NoteEnumerator from './note-enumerator';
 import NoteSerializer from './note-serializer';
-import * as os from 'os';
-import IpcLoadNotesResult from "../common/ipc-load-notes-result";
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

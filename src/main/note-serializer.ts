@@ -1,8 +1,8 @@
 import * as fs from "fs";
+import DateUtility from "../common/date-utility";
 import IpcLoadNoteResult from "../common/ipc-load-note-result";
 import IpcSaveNoteResult from "../common/ipc-save-note-result";
 import NoteItem, { NoteKind } from "../common/note-item";
-import DateUtility from "../common/date-utility";
 
 export default class NoteSerializer {
 
