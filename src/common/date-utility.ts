@@ -1,6 +1,9 @@
 export default class DateUtility {
 
-  static formatElispLike(format: string, date: Date) {
+  static formatElispLike(format: string, date: number): string;
+  static formatElispLike(format: string, date: Date): string;
+  static formatElispLike(format: string, date_: any): string {
+    const date = new Date(date_);
     return format
       .replace(/%Y/g, this.zeroPadding(date.getFullYear(), 4))
       .replace(/%m/g, this.zeroPadding(date.getMonth() + 1, 2))

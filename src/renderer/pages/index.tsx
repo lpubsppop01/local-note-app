@@ -20,6 +20,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import { ipcRenderer } from 'electron';
 import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
+import DateUtility from '../../common/date-utility';
 import FolderItem from '../../common/folder-item';
 import { IpcChannels } from '../../common/ipc-channels';
 import IpcLoadNoteResult from '../../common/ipc-load-note-result';
@@ -122,35 +123,37 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         }
       }
     });
-    ipcRenderer.on(IpcChannels.SAVED_NOTE, (event, result: IpcSaveNoteResult) => {
-      if (result.endLineNumber) {
-        let editedNote: NoteItem = null;
-        if (this.state.selectedNote && this.state.selectedNote.key === result.key) {
-          editedNote = this.state.selectedNote;
-        } else {
-          editedNote = this.state.notes.find(note => note.key === result.key);
-        }
-        const lineNumberOffset = result.endLineNumber - editedNote.endLineNumber;
+    ipcRenderer.on(IpcChannels.SAVED_NOTE, (event, result_: IpcSaveNoteResult) => {
+      const result = new IpcSaveNoteResult(result_);
+      if (!result.note) return;
+      let editedNote: NoteItem = null;
+      if (this.state.selectedNote && this.state.selectedNote.key === result.note.key) {
+        editedNote = this.state.selectedNote;
+      } else {
+        editedNote = this.state.notes.find(note => note.key === result.note.key);
+      }
+      editedNote.label = result.note.label;
+      editedNote.lastModifiedMs = result.note.lastModifiedMs;
+      if (result.note.endLineNumber) {
+        const lineNumberOffset = result.note.endLineNumber - editedNote.endLineNumber;
         editedNote.endLineNumber += lineNumberOffset;
         for (let i = 0; i < this.state.notes.length; ++i) {
           const note = this.state.notes[i];
-          if (note.filePath !== result.filePath) continue;
-          if (note.startLineNumber > result.startLineNumber) {
+          if (note.filePath !== result.note.filePath) continue;
+          if (note.startLineNumber > result.note.startLineNumber) {
             note.startLineNumber += lineNumberOffset;
             if (note.endLineNumber) {
               note.endLineNumber += lineNumberOffset;
             }
           }
         }
-        this.setState({
-          notes: this.state.notes,
-          selectedNote: this.state.selectedNote,
-          targetNote: this.state.targetNote,
-          lastModified: result.lastModified
-        });
-      } else {
-        this.setState({ lastModified: result.lastModified });
       }
+      this.setState({
+        notes: this.state.notes,
+        selectedNote: this.state.selectedNote,
+        targetNote: this.state.targetNote,
+        lastModified: DateUtility.formatElispLike("%Y/%m/%d %H:%M:%S", result.note.lastModifiedMs)
+      });
     });
     ipcRenderer.on(IpcChannels.ADDED_NOTE, (event, note_) => {
       const note = new NoteItem(note_);

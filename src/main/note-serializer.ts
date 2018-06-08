@@ -58,23 +58,21 @@ export default class NoteSerializer {
       const destFileText = destLines.join(lineSep);
       fs.writeFileSync(note.filePath, destFileText);
       const stats = fs.statSync(note.filePath);
-      const result = new IpcSaveNoteResult({
-        key: note.key,
-        filePath: note.filePath,
-        startLineNumber: note.startLineNumber,
-        endLineNumber: note.endLineNumber ? note.startLineNumber + editedLines.length - 1 : null,
-        lastModified: moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss")
-      });
+      const resultNote = note.clone();
+      const titleMatch = destFileText.match(/^= (.*)/);
+      if (titleMatch) {
+        resultNote.label = titleMatch[1];
+      }
+      resultNote.endLineNumber = note.endLineNumber ? note.startLineNumber + editedLines.length - 1 : null;
+      resultNote.lastModifiedMs = stats.mtime.getTime();
+      const result = new IpcSaveNoteResult({ note: resultNote });
       return result;
     } else {
       fs.writeFileSync(note.filePath, content);
       const stats = fs.statSync(note.filePath);
-      const result = new IpcSaveNoteResult({
-        key: note.key,
-        filePath: note.filePath,
-        startLineNumber: note.startLineNumber,
-        lastModified: moment(stats.mtime).format("YYYY/MM/DD HH:mm:ss")
-      });
+      const resultNote = note.clone();
+      resultNote.lastModifiedMs = stats.mtime.getTime();
+      const result = new IpcSaveNoteResult({ note: resultNote });
       return result;
     }
   }

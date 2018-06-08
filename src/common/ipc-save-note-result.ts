@@ -1,21 +1,17 @@
+import NoteItem from "./note-item";
+
 export default class IpcSaveNoteResult {
 
-  key: string;
-  filePath: string;
-  startLineNumber: number;
-  endLineNumber?: number;
-  lastModified: string;
+  note: NoteItem;
 
   constructor(init?: Partial<IpcSaveNoteResult>) {
     Object.assign(this, init);
+    this.note = new NoteItem(this.note);
   }
 
   clone(): IpcSaveNoteResult {
     return new IpcSaveNoteResult({
-      filePath: this.filePath,
-      startLineNumber: this.startLineNumber,
-      endLineNumber: this.endLineNumber,
-      lastModified: this.lastModified
+      note: this.note ? this.note.clone() : null
     });
   }
 
