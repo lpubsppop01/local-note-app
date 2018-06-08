@@ -73,7 +73,7 @@ app.on("ready", () => {
   ipcMain.on(IpcChannels.ADD_NOTE, (event, folderKey: string) => {
     const folder = currFolders.find(folder => folder.key == folderKey);
     const now = new Date();
-    const filename = DateUtility.formatElispLike(folder.filenameFormat, now);
+    const filename = DateUtility.formatLikeElisp(folder.filenameFormat, now);
     const filePath = path.join(folder.directoryPath, filename);
     if (fs.existsSync(filePath)) return;
     DirectoryUtility.mkdirPSync(path.dirname(filePath));
@@ -83,7 +83,7 @@ app.on("ready", () => {
     let kind = NoteKind.PlaneText;
     if (folder.isHowmDirectory) {
       content += "= New Note\r\n";
-      content += DateUtility.formatElispLike("[%Y-%m-%d %H:%M] \r\n", now);
+      content += DateUtility.formatLikeElisp("[%Y-%m-%d %H:%M] \r\n", now);
       content += "\r\n";
       label = "New Note";
       subLabel = NoteEnumerator.getSubLabel(now, filePath, folder, /* includesFilename: */ true);

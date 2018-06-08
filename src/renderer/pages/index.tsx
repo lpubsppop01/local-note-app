@@ -152,7 +152,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         notes: this.state.notes,
         selectedNote: this.state.selectedNote,
         targetNote: this.state.targetNote,
-        lastModified: DateUtility.formatElispLike("%Y/%m/%d %H:%M:%S", result.note.lastModifiedMs)
+        lastModified: DateUtility.formatLikeElisp("%Y/%m/%d %H:%M:%S", result.note.lastModifiedMs)
       });
     });
     ipcRenderer.on(IpcChannels.ADDED_NOTE, (event, note_) => {

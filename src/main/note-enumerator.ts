@@ -116,7 +116,7 @@ export default class NoteEnumerator {
   }
 
   static getSubLabel(mtime: Date, filePath: string, folder: FolderItem, includesFilename: boolean): string {
-    let subLabel = DateUtility.formatElispLike('%Y/%m/%d', mtime);
+    let subLabel = DateUtility.formatLikeElisp('%Y/%m/%d', mtime);
     const relPath = includesFilename
       ? filePath.substr(folder.directoryPath.length + 1)
       : path.dirname(filePath).substr(folder.directoryPath.length + 1);
