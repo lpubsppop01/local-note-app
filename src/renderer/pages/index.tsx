@@ -1,10 +1,4 @@
-import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -29,6 +23,7 @@ import IpcSaveNoteResult from '../../common/ipc-save-note-result';
 import NoteItem from '../../common/note-item';
 import MyListView from '../controls/my-list-view';
 import AddFolderDialog, { AddFolderDialogResult } from '../dialogs/add-folder-dialog';
+import DeleteFolderDialog from '../dialogs/delete-folder-dialog';
 import PathUtility from '../utilities/path-utility';
 import withRoot from '../withRoot';
 
@@ -462,26 +457,9 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
                          onClose={result => this.addFolderDialog_onClose(result)}
                          osIsWindows={this.state.osIsWindows} />
 
-        <Dialog
-          open={this.state.deleteFolderDialogIsOpen}
-          onClose={e => this.deleteFolderDialog_onClose(false)}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description">
-          <DialogTitle id="alert-dialog-title">Unregister Folder</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Are you sure you want to unregister this folder?
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={e => this.deleteFolderDialog_onClose(false)} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={e => this.deleteFolderDialog_onClose(true)} color="primary" autoFocus>
-              Ok
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <DeleteFolderDialog open={this.state.deleteFolderDialogIsOpen}
+                            onClose={ok => this.deleteFolderDialog_onClose(ok)}
+                            osIsWindows={this.state.osIsWindows} />
       </div>
     );
   }

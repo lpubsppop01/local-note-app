@@ -1,7 +1,5 @@
-import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from '@material-ui/core/FormControl';
@@ -14,11 +12,12 @@ import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import { ipcRenderer } from 'electron';
 import * as React from 'react';
 import { IpcChannels } from '../../common/ipc-channels';
+import MyOkCancelActions from '../controls/my-ok-cancel-actions';
 
 interface Props {
   open: boolean;
   onClose: (result: AddFolderDialogResult) => void;
-  osIsWindows?: boolean;
+  osIsWindows: boolean;
 }
 
 interface State {
@@ -47,7 +46,7 @@ export default class AddFolderDialog extends React.Component<Props, State> {
     super(props);
     this.state = {
       open: props.open,
-      osIsWindows: props.osIsWindows ? props.osIsWindows : false,
+      osIsWindows: props.osIsWindows,
       directoryPath: "",
       isHowmDirectory: true,
       filenameFormat: "%Y/%m/%Y-%m-%d-%H%M%S.howm"
@@ -62,7 +61,7 @@ export default class AddFolderDialog extends React.Component<Props, State> {
     if (nextProps.open) {
       this.setState({
         open: true,
-        osIsWindows: nextProps.osIsWindows ? nextProps.osIsWindows : this.state.osIsWindows,
+        osIsWindows: nextProps.osIsWindows,
         directoryPath: "",
         isHowmDirectory: true,
         filenameFormat: "%Y/%m/%Y-%m-%d-%H%M%S.howm"
@@ -121,17 +120,8 @@ export default class AddFolderDialog extends React.Component<Props, State> {
             </div>
           </div>
         </DialogContent>
-        {
-          this.state.osIsWindows
-          ? <DialogActions>
-              <Button onClick={this.okButton_onClick} color="primary" autoFocus>Ok</Button>
-              <Button onClick={e => this.props.onClose(null)} color="primary">Cancel</Button>
-            </DialogActions>
-          : <DialogActions>
-              <Button onClick={e => this.props.onClose(null)} color="primary">Cancel</Button>
-              <Button onClick={this.okButton_onClick} color="primary" autoFocus>Ok</Button>
-            </DialogActions>
-        }
+        <MyOkCancelActions onClick={ok => ok ? this.okButton_onClick(null) : this.props.onClose(null)}
+                           osIsWindows={this.props.osIsWindows} />
       </Dialog>
     );
   }
