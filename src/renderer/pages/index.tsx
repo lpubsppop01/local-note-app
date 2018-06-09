@@ -279,6 +279,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   }
 
   saveButton_onClick = () => {
+    this.saveNote();
+  }
+
+  saveNote = () => {
     if (!this.state.selectedNote) return;
     if (!this.state.selectedNote.filePath) return;
     ipcRenderer.send(IpcChannels.SAVE_NOTE, this.state.selectedNote, this.state.editorValue);
@@ -301,6 +305,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     editor.focus();
     editor.layout();
     editor.updateOptions({ readOnly: true });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, this.saveNote);
     ipcRenderer.send(IpcChannels.LOAD_FOLDERS);
     ipcRenderer.send(IpcChannels.LOAD_WIDTH_C1);
     ipcRenderer.send(IpcChannels.LOAD_WIDTH_C2);
@@ -388,7 +393,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
             <IconButton onClick={this.addFolderButton_onClick}><CreateNewFolderIcon /></IconButton>
           </div>
           <MyListView style={{ overflowY: "auto", height: "calc(100% - 64px)", marginTop: "16px" }}
-          　　　　　　renderItem={(index) => this.renderFolder(index)} itemHeight={48}
+                      renderItem={(index) => this.renderFolder(index)} itemHeight={48}
                       itemCount={this.state.folders ? this.state.folders.length : 0}/>
         </div>
         <div style={{ width: "16px", cursor: "col-resize" }}
