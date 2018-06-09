@@ -65,9 +65,9 @@ app.on("ready", () => {
     const content = NoteSerializer.load(note);
     event.sender.send(IpcChannels.LOADED_NOTE, content);
   });
-  ipcMain.on(IpcChannels.SAVE_NOTE, (event, note_, contentValue: string) => {
+  ipcMain.on(IpcChannels.SAVE_NOTE, (event, note_, contentValue: string, keepsMTime: boolean) => {
     const note = new NoteItem(note_);
-    const result = NoteSerializer.save(note, contentValue);
+    const result = NoteSerializer.save(note, contentValue, keepsMTime);
     event.sender.send(IpcChannels.SAVED_NOTE, result);
   });
   ipcMain.on(IpcChannels.ADD_NOTE, (event, folderKey: string) => {

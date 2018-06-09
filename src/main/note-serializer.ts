@@ -39,7 +39,7 @@ export default class NoteSerializer {
     return new IpcLoadNoteResult({ content, lastModified, created, hasError });
   }
 
-  static save(note: NoteItem, content: string): IpcSaveNoteResult {
+  static save(note: NoteItem, content: string, keepsMTime: boolean): IpcSaveNoteResult {
     if (note.kind === NoteKind.Howm) {
       const editedLines = content.split(/\n|\r\n/);
       const srcFileText = fs.readFileSync(note.filePath, 'utf-8');
@@ -56,22 +56,30 @@ export default class NoteSerializer {
       }
       let lineSep = NoteSerializer.getEOL(srcFileText, srcLines);
       const destFileText = destLines.join(lineSep);
+      const oldStats = fs.statSync(note.filePath);
       fs.writeFileSync(note.filePath, destFileText);
-      const stats = fs.statSync(note.filePath);
+      if (keepsMTime) {
+        fs.utimesSync(note.filePath, oldStats.atime, oldStats.mtime);
+      }
+      const newStats = fs.statSync(note.filePath);
       const resultNote = note.clone();
       const titleMatch = destFileText.match(/^= (.*)/);
       if (titleMatch) {
         resultNote.label = titleMatch[1];
       }
       resultNote.endLineNumber = note.endLineNumber ? note.startLineNumber + editedLines.length - 1 : null;
-      resultNote.lastModifiedMs = stats.mtime.getTime();
+      resultNote.lastModifiedMs = newStats.mtime.getTime();
       const result = new IpcSaveNoteResult({ note: resultNote });
       return result;
     } else {
+      const oldStats = fs.statSync(note.filePath);
       fs.writeFileSync(note.filePath, content);
-      const stats = fs.statSync(note.filePath);
+      if (keepsMTime) {
+        fs.utimesSync(note.filePath, oldStats.atime, oldStats.mtime);
+      }
+      const newStats = fs.statSync(note.filePath);
       const resultNote = note.clone();
-      resultNote.lastModifiedMs = stats.mtime.getTime();
+      resultNote.lastModifiedMs = newStats.mtime.getTime();
       const result = new IpcSaveNoteResult({ note: resultNote });
       return result;
     }

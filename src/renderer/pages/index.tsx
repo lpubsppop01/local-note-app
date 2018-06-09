@@ -1,3 +1,4 @@
+import { FormControl, Input, InputAdornment, InputLabel } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import IconButton from '@material-ui/core/IconButton';
 import ListItem from '@material-ui/core/ListItem';
@@ -9,6 +10,8 @@ import withStyles, { StyleRulesCallback, WithStyles } from '@material-ui/core/st
 import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
 import DeleteIcon from '@material-ui/icons/Delete';
 import InfoIcon from '@material-ui/icons/Info';
+import LockIcon from '@material-ui/icons/Lock';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import SaveIcon from '@material-ui/icons/Save';
 import { ipcRenderer } from 'electron';
@@ -59,6 +62,7 @@ type State = {
   isLoadingNotes: boolean;
   noteIsEdited: boolean,
   lastModified: string,
+  keepsMTime: boolean,
   created: string,
   widthC1: number,
   widthC2: number,
@@ -90,6 +94,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       isLoadingNotes: false,
       noteIsEdited: false,
       lastModified: "",
+      keepsMTime: false,
       created: "",
       widthC1: 200,
       widthC2: 300,
@@ -291,6 +296,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     }
   }
 
+  keepsMTimeButton_onClick = () => {
+    this.setState({ keepsMTime: !this.state.keepsMTime });
+  }
+
   saveButton_onClick = () => {
     this.saveNote();
   }
@@ -298,7 +307,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   saveNote = () => {
     if (!this.state.selectedNote) return;
     if (!this.state.selectedNote.filePath) return;
-    ipcRenderer.send(IpcChannels.SAVE_NOTE, this.state.selectedNote, this.state.editorValue);
+    ipcRenderer.send(IpcChannels.SAVE_NOTE, this.state.selectedNote, this.state.editorValue, this.state.keepsMTime);
     this.setState({ noteIsEdited: false });
   }
 
@@ -471,10 +480,20 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
              onMouseDownCapture={e => this.widthResizerC2_onMouseDown(e)} />
         <div style={{ flex: "1 1 auto", height: "100%", overflow: "hidden" }}>
           <div style={{ height: "48px", display: "flex", flexDirection: "row", alignItems: "flex-end" }}>
-            <TextField label="Last modified" style={{ flex: "0 0 auto" }}
-                       inputProps={{ readOnly: true, disabled: true }}
-                       value={this.state.lastModified} />
-            <TextField label="Created" style={{ flex: "0 0 auto", marginLeft: "8px" }}
+            <FormControl style={{ flex: "0 0 auto", width: "210px" }}>
+              <InputLabel htmlFor="adornment-password">Last modified</InputLabel>
+              <Input id="adornment-password" value={this.state.lastModified}
+                     inputProps={{ readOnly: true, disabled: true }}
+                     endAdornment={
+                <InputAdornment position="end">
+                  <IconButton aria-label="Toggle password visibility"
+                              onClick={this.keepsMTimeButton_onClick}>
+                    {this.state.keepsMTime ? <LockIcon /> : <LockOpenIcon />}
+                  </IconButton>
+                </InputAdornment>
+              }/>
+            </FormControl>
+            <TextField label="Created" style={{ flex: "0 0 auto", width: "165px", marginLeft: "8px" }}
                        inputProps={{ readOnly: true, disabled: true }}
                        value={this.state.created} />
             <IconButton aria-label="Save Note" style={{ flex: "0 0 auto" }} disabled={!this.state.noteIsEdited}
