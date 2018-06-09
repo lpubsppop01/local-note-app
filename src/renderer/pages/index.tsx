@@ -438,17 +438,17 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
            onMouseMoveCapture={e => this.root_onMouseMove(e)}
            onMouseUpCapture={e => this.root_onMouseUp(e)}>
         <div style={{ flex: "0 0 auto", width: `${this.state.widthC1}px` }}>
-          <div style={{ height: "32px", display: "flex", flexDirection: "row", justifyContent: "flex-end" }}>
+          <div style={{ display: "flex", flexDirection: "row", justifyContent: "flex-end", marginTop: "8px" }}>
             <IconButton onClick={this.addFolderButton_onClick}><CreateNewFolderIcon /></IconButton>
           </div>
-          <MyListView style={{ overflowY: "auto", height: "calc(100% - 64px)", marginTop: "16px" }}
+          <MyListView style={{ overflowY: "auto", height: "calc(100% - 64px)" }}
                       renderItem={(index) => this.renderFolder(index)} itemHeight={48}
                       itemCount={this.state.folders ? this.state.folders.length : 0}/>
         </div>
         <div style={{ width: "16px", cursor: "col-resize" }}
              onMouseDownCapture={e => this.widthResizerC1_onMouseDown(e)} />
         <div style={{ flex: "0 0 auto", width: `${this.state.widthC2}px` }}>
-          <div style={{ height: "68px", display: "flex", flexDirection: "row", alignItems: "top" }}>
+          <div style={{ height: "68px", display: "flex", flexDirection: "row" }}>
             <TextField label="Search" type="search" style={{ flex: "1 1 auto" }}
                        inputRef={(input) => {
                          this.searchInput = input;
@@ -459,7 +459,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
                          ? `${this.state.notes.length} notes (${this.state.elapsedMs} milliseconds)`
                          : null
                        }/>
-            <IconButton aria-label="Add Note" style={{ flex: "0 0 auto" }}
+            <IconButton aria-label="Add Note" style={{ flex: "0 0 auto", marginTop: "8px" }}
                         onClick={this.addNoteButton_onClick}>
               <NoteAddIcon />
             </IconButton>
@@ -479,7 +479,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         <div style={{ width: "16px", cursor: "col-resize" }}
              onMouseDownCapture={e => this.widthResizerC2_onMouseDown(e)} />
         <div style={{ flex: "1 1 auto", height: "100%", overflow: "hidden" }}>
-          <div style={{ height: "48px", display: "flex", flexDirection: "row", alignItems: "flex-end" }}>
+          <div style={{ height: "68px", display: "flex", flexDirection: "row" }}>
             <FormControl style={{ flex: "0 0 auto", width: "210px" }}>
               <InputLabel htmlFor="adornment-password">Last modified</InputLabel>
               <Input id="adornment-password" value={this.state.lastModified}
@@ -496,16 +496,18 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
             <TextField label="Created" style={{ flex: "0 0 auto", width: "165px", marginLeft: "8px" }}
                        inputProps={{ readOnly: true, disabled: true }}
                        value={this.state.created} />
-            <IconButton aria-label="Save Note" style={{ flex: "0 0 auto" }} disabled={!this.state.noteIsEdited}
+            <IconButton aria-label="Save Note" style={{ flex: "0 0 auto", marginTop: "8px" }}
+                        disabled={!this.state.noteIsEdited}
                         onClick={e => this.saveButton_onClick()}>
               <SaveIcon />
             </IconButton>
-            <IconButton aria-label="Note Info" style={{ flex: "0 0 auto" }} disabled={!this.state.selectedNote}
+            <IconButton aria-label="Note Info" style={{ flex: "0 0 auto", marginTop: "8px" }}
+                        disabled={!this.state.selectedNote}
                         onClick={e => this.noteInfoButton_onClick()}>
               <InfoIcon />
             </IconButton>
           </div>
-          <div style={{ height: "calc(100% - 64px)", marginTop: "16px" }}>
+          <div style={{ height: "calc(100% - 64px)" }}>
             <MonacoEditor height="100%"
                           language="plaintext"
                           theme="vs-light"
