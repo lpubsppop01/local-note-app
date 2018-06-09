@@ -22,7 +22,9 @@ import IpcLoadNotesResult from '../../common/ipc-load-notes-result';
 import IpcSaveNoteResult from '../../common/ipc-save-note-result';
 import NoteItem from '../../common/note-item';
 import MyListView from '../controls/my-list-view';
+import { MyYesNoCancel } from '../controls/my-yes-no-cancel-actions';
 import AddFolderDialog, { AddFolderDialogResult } from '../dialogs/add-folder-dialog';
+import ConfirmSaveNoteDialog from '../dialogs/confirm-save-note-dialog';
 import DeleteFolderDialog from '../dialogs/delete-folder-dialog';
 import PathUtility from '../utilities/path-utility';
 import withRoot from '../withRoot';
@@ -43,6 +45,8 @@ type State = {
   addFolderDialogIsOpen: boolean;
   deleteFolderDialogIsOpen: boolean;
   deleteNoteDialogIsOpen: boolean;
+  confirmSaveNoteDialogIsOpen: boolean;
+  delayedAction: () => void,
   editorValue: string;
   folders: FolderItem[];
   selectedFolder: FolderItem;
@@ -72,6 +76,8 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
       addFolderDialogIsOpen: false,
       deleteFolderDialogIsOpen: false,
       deleteNoteDialogIsOpen: false,
+      confirmSaveNoteDialogIsOpen: false,
+      delayedAction: null,
       editorValue: "",
       folders: new Array<FolderItem>(),
       selectedFolder: null,
@@ -149,6 +155,7 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         targetNote: this.state.targetNote,
         lastModified: DateUtility.formatLikeElisp("%Y/%m/%d %H:%M:%S", result.note.lastModifiedMs)
       });
+      this.doDelayedActionIfExists();
     });
     ipcRenderer.on(IpcChannels.ADDED_NOTE, (event, note_) => {
       const note = new NoteItem(note_);
@@ -238,18 +245,20 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   };
 
   folderListItem_onClick = (clickedFolder: FolderItem) => {
-    this.setState({
-      notes: new Array<NoteItem>(),
-      selectedFolder: clickedFolder,
-      isLoadingNotes: true,
-      selectedNote: null,
-      editorValue: "",
-      noteIsEdited: false,
-      lastModified: "",
-      created: ""
+    this.doAfterConfirmSaveNote(() => {
+      this.setState({
+        notes: new Array<NoteItem>(),
+        selectedFolder: clickedFolder,
+        isLoadingNotes: true,
+        selectedNote: null,
+        editorValue: "",
+        noteIsEdited: false,
+        lastModified: "",
+        created: ""
+      });
+      this.editor.updateOptions({ readOnly: true });
+      ipcRenderer.send(IpcChannels.LOAD_NOTES, clickedFolder.key, this.state.searchWord);
     });
-    this.editor.updateOptions({ readOnly: true });
-    ipcRenderer.send(IpcChannels.LOAD_NOTES, clickedFolder.key, this.state.searchWord);  
   };
 
   addNoteButton_onClick = (e) => {
@@ -257,18 +266,22 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
   };
 
   deleteNoteButton_onClick = (clickedNote: NoteItem) => {
-    this.setState({
-      deleteNoteDialogIsOpen: true,
-      targetNote: clickedNote
+    this.doAfterConfirmSaveNote(() => {
+      this.setState({
+        deleteNoteDialogIsOpen: true,
+        targetNote: clickedNote
+      });
     });
   };
 
   noteListItem_onClick = (clickedNote: NoteItem) => {
-    this.setState({
-      editorValue: "",
-      selectedNote: clickedNote
+    this.doAfterConfirmSaveNote(() => {
+      this.setState({
+        editorValue: "",
+        selectedNote: clickedNote
+      });
+      ipcRenderer.send(IpcChannels.LOAD_NOTE, clickedNote);
     });
-    ipcRenderer.send(IpcChannels.LOAD_NOTE, clickedNote);
   };
 
   searchInput_onsearch = (e: any) => {
@@ -311,6 +324,33 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
     ipcRenderer.send(IpcChannels.LOAD_WIDTH_C2);
     ipcRenderer.send(IpcChannels.CHECK_ENV);
     this.editor = editor;
+  }
+
+  doAfterConfirmSaveNote = (action: () => void) => {
+    if (this.state.noteIsEdited) {
+      this.setState({
+        confirmSaveNoteDialogIsOpen: true,
+        delayedAction: action
+      });
+    } else {
+      action();
+    }
+  }
+
+  confirmSaveNoteDialog_onClose = (result: MyYesNoCancel) => {
+    this.setState({ confirmSaveNoteDialogIsOpen: false });
+    if (result === MyYesNoCancel.Yes) {
+      this.saveNote();
+    } else if (result === MyYesNoCancel.No) {
+      this.doDelayedActionIfExists();
+    }
+  };
+
+  doDelayedActionIfExists() {
+    if (!this.state.delayedAction) return;
+    const action = this.state.delayedAction;
+    this.setState({ delayedAction: null });
+    action();
   }
 
   private resizeTarget: string;
@@ -465,6 +505,10 @@ class Index extends React.Component<WithStyles<ClassNames>, State> {
         <DeleteFolderDialog open={this.state.deleteFolderDialogIsOpen}
                             onClose={ok => this.deleteFolderDialog_onClose(ok)}
                             osIsWindows={this.state.osIsWindows} />
+
+        <ConfirmSaveNoteDialog open={this.state.confirmSaveNoteDialogIsOpen}
+                               onClose={result => this.confirmSaveNoteDialog_onClose(result)}
+                               osIsWindows={this.state.osIsWindows} />
       </div>
     );
   }
