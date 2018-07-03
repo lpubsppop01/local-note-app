@@ -20,7 +20,7 @@ export default class NoteEnumerator {
     //const rg = path.join(__dirname, '/bin/rg');
     const rg = 'rg';
     const args = word
-      ? [ '-l', word, folder.directoryPath ]
+      ? [ '-i', '-l', word, folder.directoryPath ]
       : [ '--files', folder.directoryPath ];
     NoteEnumerator.exec(rg, args, (stdout) => {
       const filePaths = stdout.split(/\n|\r\n/);
@@ -51,7 +51,7 @@ export default class NoteEnumerator {
     //const rg = path.join(__dirname, '/bin/rg');
     const rg = 'rg';
     const args = word
-      ? [ '-n', `^= |${word}`, folder.directoryPath ]
+      ? [ '-i', '-n', `^= |${word}`, folder.directoryPath ]
       : [ '-n', '^= ', folder.directoryPath ];
     NoteEnumerator.exec(rg, args, (stdout) => {
       const allNotes = new Array<NoteItem>();
