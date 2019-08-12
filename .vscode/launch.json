@@ -7,7 +7,7 @@
             "name": "Launch Program",
             "program": "${workspaceFolder}/dist/main.js",
             "preLaunchTask": null,
-            "runtimeExecutable": "electron",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "outFiles": []
         }
     ]
